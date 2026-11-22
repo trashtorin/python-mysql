@@ -1,5 +1,6 @@
 from housing_system import HousingSystem, in_bang
 from config import DB_CONFIG
+from analyzer import HousingAnalyzer
 
 COT_TIN = ["ma_tin", "dia_chi", "gia_ty", "gia_m2_tr", "dien_tich", "so_phong_ngu", "quan", "tinh_thanh", "phap_ly"]
 
@@ -50,6 +51,7 @@ def in_menu():
     print("14. Thống kê theo khoảng diện tích / số phòng ngủ")
     print("15. Phân tích theo pháp lý / Top giá cao thấp nhất")
     print("16. Xuất dữ liệu sạch ra CSV (phục vụ phân tích)")
+    print("17. Phân tích dữ liệu khám phá (EDA)")
     print(" 0. Thoát")
     print("=" * 58)
 
@@ -188,6 +190,19 @@ def xuat_csv(ht):
     duong_dan = doc_lenh("File xuất (Enter = du_lieu_sach_xuat.csv): ").strip() or None
     ht.xuat_csv_sach(duong_dan)
 
+def chay_eda(ht):
+    df = ht.lay_du_lieu_phan_tich()
+    if df is None or df.empty:
+        print("Không có dữ liệu để phân tích.")
+        return
+    analyzer = HousingAnalyzer(df)
+    analyzer.overview()
+    analyzer.analyze_price()
+    analyzer.analyze_area()
+    analyzer.analyze_relationship()
+    analyzer.analyze_location()
+    analyzer.correlation_analysis()
+
 
 def chay_chuc_nang(ht, lua_chon):
     if lua_chon == "1":
@@ -226,6 +241,8 @@ def chay_chuc_nang(ht, lua_chon):
         thong_ke(ht)
     elif lua_chon == "16":
         xuat_csv(ht)
+    elif lua_chon == "17":
+        chay_eda(ht)
     elif lua_chon == "0":
         print("Đã thoát chương trình.")
     else:
